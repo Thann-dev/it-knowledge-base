@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>IT Knowledge Base</title>
+
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header class="topbar">
+    <div>
+      <h1>IT Knowledge Base</h1>
+      <p>Kho hướng dẫn xử lý lỗi IT nội bộ</p>
+    </div>
+
+    <div class="topbar-badge">
+      IT Support
+    </div>
+  </header>
+
+  <main class="container">
+    <section class="hero">
+      <h2>Tìm hướng dẫn sửa lỗi</h2>
+      <p>
+        Tra cứu nhanh các lỗi thường gặp về máy in, Wi-Fi, Outlook, VPN và phần mềm.
+      </p>
+
+      <div class="search-box">
+        <input
+          type="text"
+          id="searchInput"
+          placeholder="Nhập từ khóa: máy in, Wi-Fi, Outlook, VPN..."
+        />
+      </div>
+    </section>
+
+    <section class="category-section">
+      <button class="category-btn active" data-category="Tất cả">Tất cả</button>
+      <button class="category-btn" data-category="Máy in">Máy in</button>
+      <button class="category-btn" data-category="Wi-Fi">Wi-Fi</button>
+      <button class="category-btn" data-category="Outlook">Outlook</button>
+      <button class="category-btn" data-category="VPN">VPN</button>
+      <button class="category-btn" data-category="Phần mềm">Phần mềm</button>
+    </section>
+
+    <section class="summary-box">
+      <div>
+        <strong id="totalArticles">0</strong>
+        <span>bài hướng dẫn</span>
+      </div>
+
+      <div>
+        <strong id="currentFilter">Tất cả</strong>
+        <span>danh mục đang xem</span>
+      </div>
+    </section>
+
+    <section id="articleList" class="article-list">
+      <!-- Danh sách bài viết sẽ hiện ở đây -->
+    </section>
+  </main>
+
+  <footer class="footer">
+    <p>© 2026 IT Support Team - Knowledge Base nội bộ</p>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>
