@@ -1,124 +1,37 @@
-const defaultArticles = [
-  {
-    title: "Máy in không in được",
-    category: "Máy in",
-    level: "Cơ bản",
-    updated: "05/06/2026",
-    keywords: ["printer", "máy in", "không in", "offline"],
-    problem:
-      "Người dùng gửi lệnh in nhưng máy in không hoạt động, báo Offline hoặc tài liệu bị kẹt trong hàng đợi.",
-    steps: [
-      "Kiểm tra máy in đã bật nguồn chưa.",
-      "Kiểm tra dây mạng hoặc cáp USB kết nối với máy in.",
-      "Vào Settings > Bluetooth & devices > Printers & scanners.",
-      "Chọn máy in đang sử dụng và kiểm tra trạng thái.",
-      "Nếu máy in báo Offline, bỏ chọn chế độ Use Printer Offline.",
-      "Xóa các lệnh in đang bị kẹt trong hàng đợi.",
-      "Khởi động lại dịch vụ Print Spooler bằng Services.msc.",
-      "In thử lại một trang test page."
-    ],
-    note:
-      "Nếu nhiều người cùng không in được, cần kiểm tra máy in, switch mạng hoặc print server."
-  },
-  {
-    title: "Không kết nối được Wi-Fi công ty",
-    category: "Wi-Fi",
-    level: "Cơ bản",
-    updated: "05/06/2026",
-    keywords: ["wifi", "wi-fi", "mạng không dây", "không kết nối"],
-    problem:
-      "Laptop không kết nối được Wi-Fi công ty hoặc báo sai mật khẩu dù nhập đúng.",
-    steps: [
-      "Kiểm tra Wi-Fi trên laptop đã bật chưa.",
-      "Bật tắt Airplane Mode.",
-      "Forget mạng Wi-Fi hiện tại rồi kết nối lại.",
-      "Nhập lại mật khẩu Wi-Fi chính xác.",
-      "Khởi động lại laptop.",
-      "Cập nhật driver card Wi-Fi nếu lỗi vẫn còn.",
-      "Thử kết nối bằng thiết bị khác để xác định lỗi từ laptop hay hệ thống Wi-Fi."
-    ],
-    note:
-      "Nếu nhiều người cùng không kết nối được, cần kiểm tra Access Point, DHCP hoặc firewall."
-  },
-  {
-    title: "Outlook không nhận được email mới",
-    category: "Outlook",
-    level: "Cơ bản",
-    updated: "05/06/2026",
-    keywords: ["outlook", "email", "không nhận mail", "send receive"],
-    problem:
-      "Người dùng mở Outlook nhưng không thấy email mới, trong khi webmail vẫn nhận bình thường.",
-    steps: [
-      "Kiểm tra máy tính có Internet không.",
-      "Mở Outlook và bấm Send/Receive All Folders.",
-      "Kiểm tra Outlook có đang ở chế độ Work Offline không.",
-      "Kiểm tra dung lượng mailbox có bị đầy không.",
-      "Đóng Outlook rồi mở lại.",
-      "Kiểm tra trạng thái tài khoản trong Account Settings.",
-      "Tạo lại Outlook profile nếu profile hiện tại bị lỗi.",
-      "Kiểm tra với webmail để xác nhận email server vẫn hoạt động."
-    ],
-    note:
-      "Nếu Outlook yêu cầu nhập mật khẩu liên tục, cần kiểm tra mật khẩu tài khoản hoặc xác thực Microsoft 365."
-  },
-  {
-    title: "Không kết nối được VPN",
-    category: "VPN",
-    level: "Trung bình",
-    updated: "05/06/2026",
-    keywords: ["vpn", "remote", "không kết nối", "work from home"],
-    problem:
-      "Người dùng làm việc từ xa không kết nối được VPN vào hệ thống công ty.",
-    steps: [
-      "Kiểm tra Internet tại nhà hoặc mạng đang sử dụng.",
-      "Kiểm tra tài khoản VPN có bị khóa hoặc hết hạn không.",
-      "Đảm bảo người dùng nhập đúng username, password và mã MFA nếu có.",
-      "Kiểm tra thời gian hệ thống trên laptop có chính xác không.",
-      "Thử đổi sang mạng khác, ví dụ 4G hotspot.",
-      "Kiểm tra phần mềm VPN đã đúng phiên bản chưa.",
-      "Gỡ và cài lại VPN client nếu cần.",
-      "Kiểm tra log lỗi VPN để xác định nguyên nhân."
-    ],
-    note:
-      "Không gửi mật khẩu VPN qua chat/email. Luôn yêu cầu người dùng đổi mật khẩu theo quy trình bảo mật."
-  },
-  {
-    title: "Phần mềm không mở được",
-    category: "Phần mềm",
-    level: "Cơ bản",
-    updated: "05/06/2026",
-    keywords: ["phần mềm", "không mở", "application", "crash"],
-    problem:
-      "Người dùng bấm mở phần mềm nhưng phần mềm không chạy hoặc tự tắt.",
-    steps: [
-      "Khởi động lại máy tính.",
-      "Kiểm tra phần mềm có đang chạy ngầm trong Task Manager không.",
-      "Run as Administrator để thử quyền chạy phần mềm.",
-      "Kiểm tra dung lượng ổ C còn đủ không.",
-      "Kiểm tra phần mềm có bị antivirus chặn không.",
-      "Cập nhật phần mềm lên phiên bản mới.",
-      "Gỡ và cài lại phần mềm nếu lỗi vẫn còn.",
-      "Kiểm tra Event Viewer để xem log lỗi chi tiết."
-    ],
-    note:
-      "Trước khi gỡ phần mềm, cần kiểm tra có dữ liệu local cần backup hay không."
-  }
-];
+import { firebaseConfig } from "./firebase-config.js";
 
-let articles = JSON.parse(localStorage.getItem("kb_articles")) || defaultArticles;
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
+
+import {
+  getAuth,
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+  signOut,
+  onAuthStateChanged
+} from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
+
+import {
+  getFirestore,
+  collection,
+  addDoc,
+  getDocs,
+  doc,
+  getDoc,
+  setDoc,
+  updateDoc,
+  deleteDoc,
+  serverTimestamp
+} from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+let articles = [];
 let currentCategory = "Tất cả";
+let currentUser = null;
+let currentUserRole = "guest";
 let authMode = "login";
-
-const defaultUsers = [
-  {
-    username: "admin",
-    password: "admin123",
-    role: "admin"
-  }
-];
-
-let users = JSON.parse(localStorage.getItem("kb_users")) || defaultUsers;
-let currentUser = JSON.parse(localStorage.getItem("kb_current_user")) || null;
 
 const articleList = document.getElementById("articleList");
 const searchInput = document.getElementById("searchInput");
@@ -151,18 +64,6 @@ const articleNote = document.getElementById("articleNote");
 const saveArticleBtn = document.getElementById("saveArticleBtn");
 const cancelEditBtn = document.getElementById("cancelEditBtn");
 
-function saveArticles() {
-  localStorage.setItem("kb_articles", JSON.stringify(articles));
-}
-
-function saveUsers() {
-  localStorage.setItem("kb_users", JSON.stringify(users));
-}
-
-function saveCurrentUser() {
-  localStorage.setItem("kb_current_user", JSON.stringify(currentUser));
-}
-
 function removeVietnameseAccent(text) {
   return text
     .normalize("NFD")
@@ -181,12 +82,38 @@ function getToday() {
 }
 
 function isAdmin() {
-  return currentUser && currentUser.role === "admin";
+  return currentUser && currentUserRole === "admin";
+}
+
+async function loadArticlesFromFirestore() {
+  articles = [];
+
+  const querySnapshot = await getDocs(collection(db, "articles"));
+
+  querySnapshot.forEach((docItem) => {
+    articles.push({
+      id: docItem.id,
+      ...docItem.data()
+    });
+  });
+
+  renderArticles();
+}
+
+async function getUserRole(uid) {
+  const userDocRef = doc(db, "users", uid);
+  const userDoc = await getDoc(userDocRef);
+
+  if (userDoc.exists()) {
+    return userDoc.data().role || "user";
+  }
+
+  return "user";
 }
 
 function updateAuthUI() {
   if (currentUser) {
-    currentUserText.textContent = `${currentUser.username} (${currentUser.role})`;
+    currentUserText.textContent = `${currentUser.email} (${currentUserRole})`;
     loginBtn.classList.add("hidden");
     registerBtn.classList.add("hidden");
     logoutBtn.classList.remove("hidden");
@@ -216,9 +143,11 @@ function openAuthModal(mode) {
   if (mode === "login") {
     modalTitle.textContent = "Đăng nhập";
     submitAuthBtn.textContent = "Đăng nhập";
+    usernameInput.placeholder = "Nhập email";
   } else {
     modalTitle.textContent = "Đăng ký";
     submitAuthBtn.textContent = "Đăng ký";
+    usernameInput.placeholder = "Nhập email";
   }
 }
 
@@ -226,67 +155,46 @@ function closeAuthModal() {
   authModal.classList.add("hidden");
 }
 
-function handleAuthSubmit() {
-  const username = usernameInput.value.trim();
+async function handleAuthSubmit() {
+  const email = usernameInput.value.trim();
   const password = passwordInput.value.trim();
 
-  if (!username || !password) {
-    authMessage.textContent = "Vui lòng nhập đầy đủ username và mật khẩu.";
+  if (!email || !password) {
+    authMessage.textContent = "Vui lòng nhập đầy đủ email và mật khẩu.";
     return;
   }
 
-  if (authMode === "login") {
-    const foundUser = users.find(
-      (user) => user.username === username && user.password === password
-    );
-
-    if (!foundUser) {
-      authMessage.textContent = "Sai username hoặc mật khẩu.";
+  try {
+    if (authMode === "login") {
+      await signInWithEmailAndPassword(auth, email, password);
+      closeAuthModal();
       return;
     }
 
-    currentUser = {
-      username: foundUser.username,
-      role: foundUser.role
-    };
+    if (authMode === "register") {
+      const userCredential = await createUserWithEmailAndPassword(
+        auth,
+        email,
+        password
+      );
 
-    saveCurrentUser();
-    closeAuthModal();
-    updateAuthUI();
-    return;
-  }
+      const user = userCredential.user;
 
-  if (authMode === "register") {
-    const existedUser = users.find((user) => user.username === username);
+      await setDoc(doc(db, "users", user.uid), {
+        email: user.email,
+        role: "user",
+        createdAt: serverTimestamp()
+      });
 
-    if (existedUser) {
-      authMessage.textContent = "Username này đã tồn tại.";
-      return;
+      closeAuthModal();
     }
-
-    users.push({
-      username,
-      password,
-      role: "user"
-    });
-
-    saveUsers();
-
-    currentUser = {
-      username,
-      role: "user"
-    };
-
-    saveCurrentUser();
-    closeAuthModal();
-    updateAuthUI();
+  } catch (error) {
+    authMessage.textContent = "Lỗi: " + error.message;
   }
 }
 
-function logout() {
-  currentUser = null;
-  localStorage.removeItem("kb_current_user");
-  updateAuthUI();
+async function logout() {
+  await signOut(auth);
 }
 
 function clearArticleForm() {
@@ -301,7 +209,7 @@ function clearArticleForm() {
   saveArticleBtn.textContent = "Lưu bài viết";
 }
 
-function saveArticleFromForm() {
+async function saveArticleFromForm() {
   if (!isAdmin()) {
     alert("Bạn không có quyền thực hiện chức năng này.");
     return;
@@ -314,11 +222,14 @@ function saveArticleFromForm() {
     .split(",")
     .map((item) => item.trim())
     .filter((item) => item !== "");
+
   const problem = articleProblem.value.trim();
+
   const steps = articleSteps.value
     .split("\n")
     .map((item) => item.trim())
     .filter((item) => item !== "");
+
   const note = articleNote.value.trim();
 
   if (!title || !problem || steps.length === 0) {
@@ -334,45 +245,63 @@ function saveArticleFromForm() {
     keywords,
     problem,
     steps,
-    note
+    note,
+    updatedAt: serverTimestamp()
   };
 
-  if (editIndex.value === "") {
-    articles.unshift(articleData);
-  } else {
-    articles[Number(editIndex.value)] = articleData;
-  }
+  try {
+    if (editIndex.value === "") {
+      await addDoc(collection(db, "articles"), {
+        ...articleData,
+        createdAt: serverTimestamp()
+      });
+    } else {
+      const articleId = editIndex.value;
+      await updateDoc(doc(db, "articles", articleId), articleData);
+    }
 
-  saveArticles();
-  clearArticleForm();
-  renderArticles();
+    clearArticleForm();
+    await loadArticlesFromFirestore();
+  } catch (error) {
+    alert("Lỗi khi lưu bài viết: " + error.message);
+  }
 }
 
-function editArticle(index) {
+function editArticle(articleId) {
   if (!isAdmin()) {
     alert("Bạn không có quyền sửa bài.");
     return;
   }
 
-  const article = articles[index];
+  const article = articles.find((item) => item.id === articleId);
 
-  editIndex.value = index;
-  articleTitle.value = article.title;
-  articleCategory.value = article.category;
-  articleLevel.value = article.level;
-  articleKeywords.value = article.keywords.join(", ");
-  articleProblem.value = article.problem;
-  articleSteps.value = article.steps.join("\n");
-  articleNote.value = article.note;
+  if (!article) {
+    alert("Không tìm thấy bài viết.");
+    return;
+  }
+
+  editIndex.value = article.id;
+  articleTitle.value = article.title || "";
+  articleCategory.value = article.category || "Máy in";
+  articleLevel.value = article.level || "Cơ bản";
+  articleKeywords.value = Array.isArray(article.keywords)
+    ? article.keywords.join(", ")
+    : "";
+  articleProblem.value = article.problem || "";
+  articleSteps.value = Array.isArray(article.steps)
+    ? article.steps.join("\n")
+    : "";
+  articleNote.value = article.note || "";
 
   saveArticleBtn.textContent = "Cập nhật bài viết";
+
   window.scrollTo({
     top: adminPanel.offsetTop - 20,
     behavior: "smooth"
   });
 }
 
-function deleteArticle(index) {
+async function deleteArticle(articleId) {
   if (!isAdmin()) {
     alert("Bạn không có quyền xóa bài.");
     return;
@@ -384,40 +313,39 @@ function deleteArticle(index) {
     return;
   }
 
-  articles.splice(index, 1);
-  saveArticles();
-  renderArticles();
+  try {
+    await deleteDoc(doc(db, "articles", articleId));
+    await loadArticlesFromFirestore();
+  } catch (error) {
+    alert("Lỗi khi xóa bài viết: " + error.message);
+  }
 }
 
 function renderArticles() {
   const searchText = removeVietnameseAccent(searchInput.value.toLowerCase());
 
-  const filteredArticles = articles
-    .map((article, originalIndex) => {
-      return {
-        ...article,
-        originalIndex
-      };
-    })
-    .filter((article) => {
-      const fullText = removeVietnameseAccent(
-        `
-        ${article.title}
-        ${article.category}
-        ${article.level}
-        ${article.keywords.join(" ")}
-        ${article.problem}
-        ${article.steps.join(" ")}
-        ${article.note}
-        `.toLowerCase()
-      );
+  const filteredArticles = articles.filter((article) => {
+    const keywords = Array.isArray(article.keywords) ? article.keywords : [];
+    const steps = Array.isArray(article.steps) ? article.steps : [];
 
-      const matchSearch = fullText.includes(searchText);
-      const matchCategory =
-        currentCategory === "Tất cả" || article.category === currentCategory;
+    const fullText = removeVietnameseAccent(
+      `
+      ${article.title || ""}
+      ${article.category || ""}
+      ${article.level || ""}
+      ${keywords.join(" ")}
+      ${article.problem || ""}
+      ${steps.join(" ")}
+      ${article.note || ""}
+      `.toLowerCase()
+    );
 
-      return matchSearch && matchCategory;
-    });
+    const matchSearch = fullText.includes(searchText);
+    const matchCategory =
+      currentCategory === "Tất cả" || article.category === currentCategory;
+
+    return matchSearch && matchCategory;
+  });
 
   totalArticles.textContent = filteredArticles.length;
   currentFilter.textContent = currentCategory;
@@ -434,30 +362,30 @@ function renderArticles() {
 
   articleList.innerHTML = filteredArticles
     .map((article) => {
-      const stepsHtml = article.steps
-        .map((step) => `<li>${step}</li>`)
-        .join("");
+      const steps = Array.isArray(article.steps) ? article.steps : [];
+
+      const stepsHtml = steps.map((step) => `<li>${step}</li>`).join("");
 
       const adminButtons = isAdmin()
         ? `
           <div class="article-admin-actions">
-            <button class="edit-btn" onclick="editArticle(${article.originalIndex})">Sửa</button>
-            <button class="delete-btn" onclick="deleteArticle(${article.originalIndex})">Xóa</button>
+            <button class="edit-btn" onclick="editArticle('${article.id}')">Sửa</button>
+            <button class="delete-btn" onclick="deleteArticle('${article.id}')">Xóa</button>
           </div>
         `
         : "";
 
       return `
         <article class="article-card">
-          <h3>${article.title}</h3>
+          <h3>${article.title || ""}</h3>
 
           <div class="article-meta">
-            <span class="tag">${article.category}</span>
-            <span class="tag level">${article.level}</span>
-            <span class="tag updated">Cập nhật: ${article.updated}</span>
+            <span class="tag">${article.category || ""}</span>
+            <span class="tag level">${article.level || ""}</span>
+            <span class="tag updated">Cập nhật: ${article.updated || ""}</span>
           </div>
 
-          <p><strong>Triệu chứng:</strong> ${article.problem}</p>
+          <p><strong>Triệu chứng:</strong> ${article.problem || ""}</p>
 
           <details>
             <summary>Xem hướng dẫn xử lý</summary>
@@ -467,7 +395,7 @@ function renderArticles() {
             </ol>
 
             <div class="note-box">
-              <strong>Ghi chú IT:</strong> ${article.note}
+              <strong>Ghi chú IT:</strong> ${article.note || ""}
             </div>
           </details>
 
@@ -498,4 +426,19 @@ submitAuthBtn.addEventListener("click", handleAuthSubmit);
 saveArticleBtn.addEventListener("click", saveArticleFromForm);
 cancelEditBtn.addEventListener("click", clearArticleForm);
 
-updateAuthUI();
+window.editArticle = editArticle;
+window.deleteArticle = deleteArticle;
+
+onAuthStateChanged(auth, async (user) => {
+  if (user) {
+    currentUser = user;
+    currentUserRole = await getUserRole(user.uid);
+  } else {
+    currentUser = null;
+    currentUserRole = "guest";
+  }
+
+  updateAuthUI();
+});
+
+loadArticlesFromFirestore();
