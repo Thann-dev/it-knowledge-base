@@ -1,4 +1,4 @@
-const articles = [
+const defaultArticles = [
   {
     title: "Máy in không in được",
     category: "Máy in",
@@ -105,13 +105,63 @@ const articles = [
   }
 ];
 
+let articles = JSON.parse(localStorage.getItem("kb_articles")) || defaultArticles;
 let currentCategory = "Tất cả";
+let authMode = "login";
+
+const defaultUsers = [
+  {
+    username: "admin",
+    password: "admin123",
+    role: "admin"
+  }
+];
+
+let users = JSON.parse(localStorage.getItem("kb_users")) || defaultUsers;
+let currentUser = JSON.parse(localStorage.getItem("kb_current_user")) || null;
 
 const articleList = document.getElementById("articleList");
 const searchInput = document.getElementById("searchInput");
 const totalArticles = document.getElementById("totalArticles");
 const currentFilter = document.getElementById("currentFilter");
 const categoryButtons = document.querySelectorAll(".category-btn");
+
+const currentUserText = document.getElementById("currentUserText");
+const loginBtn = document.getElementById("loginBtn");
+const registerBtn = document.getElementById("registerBtn");
+const logoutBtn = document.getElementById("logoutBtn");
+
+const authModal = document.getElementById("authModal");
+const modalTitle = document.getElementById("modalTitle");
+const usernameInput = document.getElementById("usernameInput");
+const passwordInput = document.getElementById("passwordInput");
+const submitAuthBtn = document.getElementById("submitAuthBtn");
+const closeModalBtn = document.getElementById("closeModalBtn");
+const authMessage = document.getElementById("authMessage");
+
+const adminPanel = document.getElementById("adminPanel");
+const editIndex = document.getElementById("editIndex");
+const articleTitle = document.getElementById("articleTitle");
+const articleCategory = document.getElementById("articleCategory");
+const articleLevel = document.getElementById("articleLevel");
+const articleKeywords = document.getElementById("articleKeywords");
+const articleProblem = document.getElementById("articleProblem");
+const articleSteps = document.getElementById("articleSteps");
+const articleNote = document.getElementById("articleNote");
+const saveArticleBtn = document.getElementById("saveArticleBtn");
+const cancelEditBtn = document.getElementById("cancelEditBtn");
+
+function saveArticles() {
+  localStorage.setItem("kb_articles", JSON.stringify(articles));
+}
+
+function saveUsers() {
+  localStorage.setItem("kb_users", JSON.stringify(users));
+}
+
+function saveCurrentUser() {
+  localStorage.setItem("kb_current_user", JSON.stringify(currentUser));
+}
 
 function removeVietnameseAccent(text) {
   return text
@@ -121,28 +171,253 @@ function removeVietnameseAccent(text) {
     .replace(/Đ/g, "D");
 }
 
+function getToday() {
+  const today = new Date();
+  const day = String(today.getDate()).padStart(2, "0");
+  const month = String(today.getMonth() + 1).padStart(2, "0");
+  const year = today.getFullYear();
+
+  return `${day}/${month}/${year}`;
+}
+
+function isAdmin() {
+  return currentUser && currentUser.role === "admin";
+}
+
+function updateAuthUI() {
+  if (currentUser) {
+    currentUserText.textContent = `${currentUser.username} (${currentUser.role})`;
+    loginBtn.classList.add("hidden");
+    registerBtn.classList.add("hidden");
+    logoutBtn.classList.remove("hidden");
+  } else {
+    currentUserText.textContent = "Chưa đăng nhập";
+    loginBtn.classList.remove("hidden");
+    registerBtn.classList.remove("hidden");
+    logoutBtn.classList.add("hidden");
+  }
+
+  if (isAdmin()) {
+    adminPanel.classList.remove("hidden");
+  } else {
+    adminPanel.classList.add("hidden");
+  }
+
+  renderArticles();
+}
+
+function openAuthModal(mode) {
+  authMode = mode;
+  authModal.classList.remove("hidden");
+  usernameInput.value = "";
+  passwordInput.value = "";
+  authMessage.textContent = "";
+
+  if (mode === "login") {
+    modalTitle.textContent = "Đăng nhập";
+    submitAuthBtn.textContent = "Đăng nhập";
+  } else {
+    modalTitle.textContent = "Đăng ký";
+    submitAuthBtn.textContent = "Đăng ký";
+  }
+}
+
+function closeAuthModal() {
+  authModal.classList.add("hidden");
+}
+
+function handleAuthSubmit() {
+  const username = usernameInput.value.trim();
+  const password = passwordInput.value.trim();
+
+  if (!username || !password) {
+    authMessage.textContent = "Vui lòng nhập đầy đủ username và mật khẩu.";
+    return;
+  }
+
+  if (authMode === "login") {
+    const foundUser = users.find(
+      (user) => user.username === username && user.password === password
+    );
+
+    if (!foundUser) {
+      authMessage.textContent = "Sai username hoặc mật khẩu.";
+      return;
+    }
+
+    currentUser = {
+      username: foundUser.username,
+      role: foundUser.role
+    };
+
+    saveCurrentUser();
+    closeAuthModal();
+    updateAuthUI();
+    return;
+  }
+
+  if (authMode === "register") {
+    const existedUser = users.find((user) => user.username === username);
+
+    if (existedUser) {
+      authMessage.textContent = "Username này đã tồn tại.";
+      return;
+    }
+
+    users.push({
+      username,
+      password,
+      role: "user"
+    });
+
+    saveUsers();
+
+    currentUser = {
+      username,
+      role: "user"
+    };
+
+    saveCurrentUser();
+    closeAuthModal();
+    updateAuthUI();
+  }
+}
+
+function logout() {
+  currentUser = null;
+  localStorage.removeItem("kb_current_user");
+  updateAuthUI();
+}
+
+function clearArticleForm() {
+  editIndex.value = "";
+  articleTitle.value = "";
+  articleCategory.value = "Máy in";
+  articleLevel.value = "Cơ bản";
+  articleKeywords.value = "";
+  articleProblem.value = "";
+  articleSteps.value = "";
+  articleNote.value = "";
+  saveArticleBtn.textContent = "Lưu bài viết";
+}
+
+function saveArticleFromForm() {
+  if (!isAdmin()) {
+    alert("Bạn không có quyền thực hiện chức năng này.");
+    return;
+  }
+
+  const title = articleTitle.value.trim();
+  const category = articleCategory.value;
+  const level = articleLevel.value;
+  const keywords = articleKeywords.value
+    .split(",")
+    .map((item) => item.trim())
+    .filter((item) => item !== "");
+  const problem = articleProblem.value.trim();
+  const steps = articleSteps.value
+    .split("\n")
+    .map((item) => item.trim())
+    .filter((item) => item !== "");
+  const note = articleNote.value.trim();
+
+  if (!title || !problem || steps.length === 0) {
+    alert("Vui lòng nhập tiêu đề, triệu chứng và các bước xử lý.");
+    return;
+  }
+
+  const articleData = {
+    title,
+    category,
+    level,
+    updated: getToday(),
+    keywords,
+    problem,
+    steps,
+    note
+  };
+
+  if (editIndex.value === "") {
+    articles.unshift(articleData);
+  } else {
+    articles[Number(editIndex.value)] = articleData;
+  }
+
+  saveArticles();
+  clearArticleForm();
+  renderArticles();
+}
+
+function editArticle(index) {
+  if (!isAdmin()) {
+    alert("Bạn không có quyền sửa bài.");
+    return;
+  }
+
+  const article = articles[index];
+
+  editIndex.value = index;
+  articleTitle.value = article.title;
+  articleCategory.value = article.category;
+  articleLevel.value = article.level;
+  articleKeywords.value = article.keywords.join(", ");
+  articleProblem.value = article.problem;
+  articleSteps.value = article.steps.join("\n");
+  articleNote.value = article.note;
+
+  saveArticleBtn.textContent = "Cập nhật bài viết";
+  window.scrollTo({
+    top: adminPanel.offsetTop - 20,
+    behavior: "smooth"
+  });
+}
+
+function deleteArticle(index) {
+  if (!isAdmin()) {
+    alert("Bạn không có quyền xóa bài.");
+    return;
+  }
+
+  const confirmDelete = confirm("Bạn có chắc muốn xóa bài viết này không?");
+
+  if (!confirmDelete) {
+    return;
+  }
+
+  articles.splice(index, 1);
+  saveArticles();
+  renderArticles();
+}
+
 function renderArticles() {
   const searchText = removeVietnameseAccent(searchInput.value.toLowerCase());
 
-  const filteredArticles = articles.filter((article) => {
-    const fullText = removeVietnameseAccent(
-      `
-      ${article.title}
-      ${article.category}
-      ${article.level}
-      ${article.keywords.join(" ")}
-      ${article.problem}
-      ${article.steps.join(" ")}
-      ${article.note}
-      `.toLowerCase()
-    );
+  const filteredArticles = articles
+    .map((article, originalIndex) => {
+      return {
+        ...article,
+        originalIndex
+      };
+    })
+    .filter((article) => {
+      const fullText = removeVietnameseAccent(
+        `
+        ${article.title}
+        ${article.category}
+        ${article.level}
+        ${article.keywords.join(" ")}
+        ${article.problem}
+        ${article.steps.join(" ")}
+        ${article.note}
+        `.toLowerCase()
+      );
 
-    const matchSearch = fullText.includes(searchText);
-    const matchCategory =
-      currentCategory === "Tất cả" || article.category === currentCategory;
+      const matchSearch = fullText.includes(searchText);
+      const matchCategory =
+        currentCategory === "Tất cả" || article.category === currentCategory;
 
-    return matchSearch && matchCategory;
-  });
+      return matchSearch && matchCategory;
+    });
 
   totalArticles.textContent = filteredArticles.length;
   currentFilter.textContent = currentCategory;
@@ -162,6 +437,15 @@ function renderArticles() {
       const stepsHtml = article.steps
         .map((step) => `<li>${step}</li>`)
         .join("");
+
+      const adminButtons = isAdmin()
+        ? `
+          <div class="article-admin-actions">
+            <button class="edit-btn" onclick="editArticle(${article.originalIndex})">Sửa</button>
+            <button class="delete-btn" onclick="deleteArticle(${article.originalIndex})">Xóa</button>
+          </div>
+        `
+        : "";
 
       return `
         <article class="article-card">
@@ -186,6 +470,8 @@ function renderArticles() {
               <strong>Ghi chú IT:</strong> ${article.note}
             </div>
           </details>
+
+          ${adminButtons}
         </article>
       `;
     })
@@ -204,4 +490,12 @@ categoryButtons.forEach((button) => {
 
 searchInput.addEventListener("input", renderArticles);
 
-renderArticles();
+loginBtn.addEventListener("click", () => openAuthModal("login"));
+registerBtn.addEventListener("click", () => openAuthModal("register"));
+logoutBtn.addEventListener("click", logout);
+closeModalBtn.addEventListener("click", closeAuthModal);
+submitAuthBtn.addEventListener("click", handleAuthSubmit);
+saveArticleBtn.addEventListener("click", saveArticleFromForm);
+cancelEditBtn.addEventListener("click", clearArticleForm);
+
+updateAuthUI();

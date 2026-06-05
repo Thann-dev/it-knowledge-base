@@ -10,15 +10,18 @@
 </head>
 <body>
   <header class="topbar">
-    <div>
-      <h1>IT Knowledge Base</h1>
-      <p>Kho hướng dẫn xử lý lỗi IT nội bộ</p>
-    </div>
+  <div>
+    <h1>IT Knowledge Base</h1>
+    <p>Kho hướng dẫn xử lý lỗi IT nội bộ</p>
+  </div>
 
-    <div class="topbar-badge">
-      IT Support
-    </div>
-  </header>
+  <div class="auth-area">
+    <span id="currentUserText">Chưa đăng nhập</span>
+    <button id="loginBtn" class="auth-btn">Đăng nhập</button>
+    <button id="registerBtn" class="auth-btn secondary">Đăng ký</button>
+    <button id="logoutBtn" class="auth-btn danger hidden">Đăng xuất</button>
+  </div>
+</header>
 
   <main class="container">
     <section class="hero">
@@ -57,6 +60,63 @@
       </div>
     </section>
 
+    <section id="adminPanel" class="admin-panel hidden">
+  <h2>Quản lý bài viết FAQ</h2>
+  <p>Chỉ tài khoản admin mới thấy khu vực này.</p>
+
+  <input type="hidden" id="editIndex" value="" />
+
+  <div class="form-grid">
+    <div>
+      <label>Tiêu đề lỗi</label>
+      <input type="text" id="articleTitle" placeholder="Ví dụ: Máy in bị kẹt giấy" />
+    </div>
+
+    <div>
+      <label>Danh mục</label>
+      <select id="articleCategory">
+        <option>Máy in</option>
+        <option>Wi-Fi</option>
+        <option>Outlook</option>
+        <option>VPN</option>
+        <option>Phần mềm</option>
+      </select>
+    </div>
+
+    <div>
+      <label>Mức độ</label>
+      <select id="articleLevel">
+        <option>Cơ bản</option>
+        <option>Trung bình</option>
+        <option>Nâng cao</option>
+      </select>
+    </div>
+
+    <div>
+      <label>Từ khóa</label>
+      <input type="text" id="articleKeywords" placeholder="máy in, lỗi in, printer" />
+    </div>
+  </div>
+
+  <label>Triệu chứng</label>
+  <textarea id="articleProblem" placeholder="Mô tả lỗi người dùng gặp phải"></textarea>
+
+  <label>Các bước xử lý</label>
+  <textarea id="articleSteps" placeholder="Mỗi bước nhập trên 1 dòng"></textarea>
+
+  <label>Ghi chú IT</label>
+  <textarea id="articleNote" placeholder="Ghi chú thêm cho IT"></textarea>
+
+  <div class="admin-actions">
+    <button id="saveArticleBtn">Lưu bài viết</button>
+    <button id="cancelEditBtn" class="secondary-btn">Hủy sửa</button>
+  </div>
+</section>
+
+<section id="articleList" class="article-list">
+  <!-- Danh sách bài viết sẽ hiện ở đây -->
+</section>
+
     <section id="articleList" class="article-list">
       <!-- Danh sách bài viết sẽ hiện ở đây -->
     </section>
@@ -65,6 +125,25 @@
   <footer class="footer">
     <p>© 2026 IT Support Team - NhanNTT6 By</p>
   </footer>
+
+  <div id="authModal" class="modal hidden">
+  <div class="modal-content">
+    <h2 id="modalTitle">Đăng nhập</h2>
+
+    <label>Tên đăng nhập</label>
+    <input type="text" id="usernameInput" placeholder="Nhập username" />
+
+    <label>Mật khẩu</label>
+    <input type="password" id="passwordInput" placeholder="Nhập mật khẩu" />
+
+    <p id="authMessage" class="auth-message"></p>
+
+    <div class="modal-actions">
+      <button id="submitAuthBtn">Xác nhận</button>
+      <button id="closeModalBtn" class="secondary-btn">Đóng</button>
+    </div>
+  </div>
+</div>
 
   <script src="script.js"></script>
 </body>
